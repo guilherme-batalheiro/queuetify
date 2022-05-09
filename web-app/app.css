@@ -1,0 +1,40 @@
+body {
+  background-color: black;
+}
+
+#content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 50vh;
+    flex-shrink: 0;
+}
+
+#home {
+    display:none;
+    text-align: center;
+}
+
+#room {
+    display: none;
+}
+
+#logged {
+    display: none;
+}
+
+#notLogged {
+    display: none;
+}
+
+.btn {
+   margin-left: 1vw; 
+   margin-right: 1vw; 
+   margin-bottom: 1vh; 
+}
+
+h1 {
+    font-family: 'Radio Canada', sans-serif;
+    color: white;
+}
