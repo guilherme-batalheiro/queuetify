@@ -34,7 +34,7 @@ body {
    margin-bottom: 1vh; 
 }
 
-h1 {
+h1, h2, h3 {
     font-family: 'Radio Canada', sans-serif;
     color: white;
 }

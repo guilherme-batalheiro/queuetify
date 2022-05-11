@@ -121,7 +121,8 @@ function updateSong(room_code, loop) {
             setTimeout(updateSong, 5000, room_code, true)
             throw Error(response.statusText);
         } else if (response.status == 204) {
-            console.log(data.song_name)
+            document.getElementById("song_name").innerHTML = localStorage.getItem('song_name')
+            document.getElementById("song_artits").innerHTML = localStorage.getItem('song_artits')
             setTimeout(updateSong, 50000, room_code, true)
             throw Error(response.statusText);
         }
@@ -132,12 +133,15 @@ function updateSong(room_code, loop) {
         console.log(data.song_name)
         if (data.song_name != localStorage.getItem("song_name")) {
             localStorage.setItem("song_name", data.song_name)
+            localStorage.setItem("song_artists", data.song_artists)
             localStorage.setItem("can_vote", true)
         }
         if(loop) {
             let timer = data.duration_ms - data.progress_ms + 500
             setTimeout(updateSong, timer, room_code, true)
         }
+        document.getElementById("song_name").innerHTML = localStorage.getItem('song_name')
+        document.getElementById("song_artists").innerHTML = localStorage.getItem('song_artists')
     })
     .catch(function(error) {
         console.log(error);
@@ -155,7 +159,6 @@ function voteToSkipSong() {
             return response.json()
         })
         .then(data => {
-            console.log(data)
             if(!data.music_skipped) 
                 alert(data.missing_votes + " people left to vote!")
             else
