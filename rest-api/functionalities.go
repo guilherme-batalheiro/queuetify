@@ -10,9 +10,6 @@ import (
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-var users_number int = 0
-var users_map map[string]int
-
 func generate_room_code() string {
 	// generate the room code
 
