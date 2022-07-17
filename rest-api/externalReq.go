@@ -40,7 +40,7 @@ func request_current_song_info(token string) (map[string]interface{}, error) {
 
 	if resp.StatusCode != 200 {
 		if resp.StatusCode == 204 {
-			return nil, errors.New("No song playing.")
+			return nil, errors.New("no song playing")
 		}
 
 		return nil, errors.New(resp.Status)
@@ -294,7 +294,7 @@ func request_available_device_id(token string) (string, error) {
 
 	devices := json_response["devices"].([]interface{})
 	if len(devices) == 0 {
-		return "", errors.New("No devices available found")
+		return "", errors.New("no devices available found")
 	}
 
 	first_device := devices[0].(map[string]interface{})
@@ -346,7 +346,7 @@ func request_song_info(token string, song_name string) (map[string]interface{}, 
 
 	json_response = json_response["tracks"].(map[string]interface{})
 	if json_response["total"].(float64) == 0 {
-		return nil, errors.New("Not found!")
+		return nil, errors.New("not found")
 	}
 
 	array_response = json_response["items"].([]interface{})
