@@ -1,4 +1,8 @@
-const url = "http://accounts.spotify.com/authorize?response_type=code&client_id=f4a290e1e7a648458eb0cc169279c4ac&scope=user-read-email%20user-modify-playback-state%20user-read-playback-state%20user-read-currently-playing&redirect_uri=http%3A%2F%2F127.0.0.1%3A8081%2Fapp.html"
+const hostAddress = "127.0.0.1"
+const hostBackEndPort = "8080"
+const hostFrontEndPort = "8081"
+
+const url = "http://accounts.spotify.com/authorize?response_type=code&client_id=f4a290e1e7a648458eb0cc169279c4ac&scope=user-read-email%20user-modify-playback-state%20user-read-playback-state%20user-read-currently-playing&redirect_uri=http%3A%2F%2F" + hostAddress + "%3A" + hostFrontEndPort + "%2Fapp.html"
 
 const urlSearchParams = new URLSearchParams(window.location.search)
 const params = Object.fromEntries(urlSearchParams.entries())
@@ -11,7 +15,7 @@ function createRoom() {
 
 function startAuth(autherizationCode) {
     // This funtion create room and log in into the app.
-    fetch('http://127.0.0.1:8080/auth?code=' + autherizationCode, {
+    fetch('http://' + hostAddress + ':' + hostBackEndPort + '/auth?code=' + autherizationCode, {
         method: 'get',
     })
     .then(response => {
@@ -25,7 +29,7 @@ function startAuth(autherizationCode) {
         localStorage.setItem('user_id', data.user_id);
         localStorage.setItem('display_name', data.display_name);
             
-        fetch('http://127.0.0.1:8080/create_room?user_id=' + data.user_id, {
+        fetch('http://' + hostAddress + ':' + hostBackEndPort + '/create_room?user_id=' + data.user_id, {
             method: 'get',
         })
         .then(response => {
@@ -37,7 +41,7 @@ function startAuth(autherizationCode) {
         })
         .then(data => { 
             localStorage.setItem('room_code', data.room_code);
-            window.open("http://127.0.0.1:8081/app.html", "_self")
+            window.open("http://" + hostAddress + ":" + hostFrontEndPort + "/app.html", "_self")
         })
         .catch(function(error) {
             console.log(error);
@@ -53,31 +57,31 @@ function startAuth(autherizationCode) {
 
 function closeRoom() {
     // Close room if the request failed close the room anywais
-    fetch('http://127.0.0.1:8080/delete_room?user_id=' + localStorage.getItem("user_id"), {
+    fetch('http://' + hostAddress + ':' + hostBackEndPort + '/delete_room?user_id=' + localStorage.getItem("user_id"), {
         method: 'post',
     })
     .then(response => {
         
         localStorage.clear() 
-        window.open("http://127.0.0.1:8081/app.html", "_self")
+        window.open("http://" + hostAddress + ":" + hostFrontEndPort + "/app.html", "_self")
     })
 }
 
 function exitRoom() {
     // Exit room if the request failed close the room anywais
-    fetch('http://127.0.0.1:8080/exit_room?room_code=' + localStorage.getItem("room_code"), {
+    fetch('http://' + hostAddress + ':' + hostBackEndPort + '/exit_room?room_code=' + localStorage.getItem("room_code"), {
         method: 'post',
     })
     .then(response => {
         localStorage.clear() 
-        window.open("http://127.0.0.1:8081/app.html", "_self")
+        window.open("http://" + hostAddress + ":" + hostFrontEndPort + "/app.html", "_self")
     })
 }
 
 function addMusicToQueue() {
     // Add music to queue
     let songName = document.getElementById('songNameInput').value
-    fetch('http://127.0.0.1:8080/add_to_queue?room_code=' + localStorage.getItem('room_code') + '&song_name=' + songName, {
+    fetch('http://' + hostAddress + ':' + hostBackEndPort + '/add_to_queue?room_code=' + localStorage.getItem('room_code') + '&song_name=' + songName, {
         method: 'get',})
     .then(response => {
         if (!response.ok) {
@@ -97,14 +101,14 @@ function addMusicToQueue() {
 function joinRoom() {
     let room_code = prompt("Please a room code:","******");
     if (room_code != null && room_code.length == 6) {
-        fetch('http://127.0.0.1:8080/join_room?room_code=' + room_code, {
+        fetch('http://' + hostAddress + ':' + hostBackEndPort + '/join_room?room_code=' + room_code, {
             method: 'post',})
         .then(response => {
             if (!response.ok) {
                 throw Error(response.statusText);
             }
             localStorage.setItem('room_code', room_code);
-            window.open("http://127.0.0.1:8081/app.html", "_self")
+            window.open("http://" + hostAddress + ":" + hostFrontEndPort + "/app.html", "_self")
         })
         .catch(function(error) {
             alert("Failed to join room!")
@@ -114,7 +118,7 @@ function joinRoom() {
 }
 
 function updateSong(room_code, loop) {
-    fetch('http://127.0.0.1:8080/current_song?room_code=' + room_code, {
+    fetch('http://' + hostAddress + ':' + hostBackEndPort + '/current_song?room_code=' + room_code, {
         method: 'get',})
     .then(response => {
         if (!response.ok) {
@@ -150,7 +154,7 @@ function updateSong(room_code, loop) {
 
 function voteToSkipSong() {
     if(localStorage.getItem("can_vote")) {
-        fetch('http://127.0.0.1:8080/vote_skip_song?room_code=' + localStorage.getItem("room_code"), {
+        fetch('http://' + hostAddress + ':' + hostBackEndPort + '/vote_skip_song?room_code=' + localStorage.getItem("room_code"), {
             method: 'get',})
         .then(response => {
             if (!response.ok) {

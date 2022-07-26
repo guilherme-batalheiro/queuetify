@@ -181,5 +181,5 @@ func main() {
 	router.GET("/current_song", current_song)
 	router.GET("/pingAPI", checkAPI)
 	router.GET("/pingDB", checkDB)
-	router.Run("localhost:8080")
+	router.Run(os.Getenv("ADDRESS"))
 }
