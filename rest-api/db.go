@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -79,10 +80,14 @@ func icrement_users_number_in_db(room_code string) error {
 		return err
 	}
 
-	_, err = result.RowsAffected()
+	rows_affected, err := result.RowsAffected()
 	// check if a row was affected this is used to check if the room_code is valid
 	if err != nil {
 		return err
+	}
+
+	if rows_affected == 0 {
+		return fmt.Errorf("no row affected")
 	}
 
 	return nil
@@ -99,10 +104,14 @@ func decrement_users_number_in_db(room_code string) error {
 		return err
 	}
 
-	_, err = result.RowsAffected()
+	rows_affected, err := result.RowsAffected()
 	// check if a row was affected this is used to check if the room_code is valid
 	if err != nil {
 		return err
+	}
+
+	if rows_affected == 0 {
+		return fmt.Errorf("no row affected")
 	}
 
 	return nil
