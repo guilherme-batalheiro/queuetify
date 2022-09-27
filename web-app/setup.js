@@ -1,4 +1,4 @@
-const hostAddress = "127.0.0.1"
+const hostAddress = "120.0.0.1"
 const hostBackEndPort = "8080"
 const hostFrontEndPort = "8081"
 
@@ -138,7 +138,7 @@ function updateSong(room_code, loop) {
         if (data.song_name != localStorage.getItem("song_name")) {
             localStorage.setItem("song_name", data.song_name)
             localStorage.setItem("song_artists", data.song_artists)
-            localStorage.setItem("can_vote", true)
+            localStorage.setItem("can_vote", "true")
         }
         if(loop) {
             let timer = data.duration_ms - data.progress_ms + 500
@@ -153,13 +153,21 @@ function updateSong(room_code, loop) {
 }
 
 function voteToSkipSong() {
-    if(localStorage.getItem("can_vote")) {
+	if (progress_voting) {
+        return;
+    }
+
+    progress_voting = true;
+
+	console.log(localStorage.getItem("can_vote"))
+    if(localStorage.getItem("can_vote") == "true") {
         fetch('http://' + hostAddress + ':' + hostBackEndPort + '/vote_skip_song?room_code=' + localStorage.getItem("room_code"), {
             method: 'get',})
         .then(response => {
             if (!response.ok) {
                 throw Error(response.statusText);
             }
+			localStorage.setItem("can_vote", "false")
             return response.json()
         })
         .then(data => {
@@ -171,10 +179,12 @@ function voteToSkipSong() {
         })
         .catch(function(error) {
             alert("Vote failed!")
+			localStorage.setItem("can_vote", "true")
             console.log(error);
         });
-
-    }
+    } else {
+		alert("You already voted if a new song is playing refresh the page.")
+	}
 }
 
 if (token != null) {
@@ -182,6 +192,7 @@ if (token != null) {
 }
 
 let room_code = localStorage.getItem("room_code") 
+let progress_voting = false;
 if (room_code != null) {
     updateSong(room_code, true)
 }
