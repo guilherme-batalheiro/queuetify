@@ -1,4 +1,4 @@
-const hostAddress = "120.0.0.1"
+const hostAddress = "127.0.0.1"
 const hostBackEndPort = "8080"
 const hostFrontEndPort = "8081"
 
