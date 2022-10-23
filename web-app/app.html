@@ -12,8 +12,9 @@
         <div id="content">
             <div id="home">
                 <h1 id="app_name">Party Queue</h1>
-                <button type="button" onclick="createRoom()">Create room</button>
-                <button type="button" onclick="joinRoom()">Join room</button>
+                <button id="create_room_button" type="button" onclick="createRoom()">Create room</button>
+
+                <button id="join_room_button" type="button" onclick="joinRoom()">Join room</button>
             </div>
             <div id="room">
                 <h1 id="room_code"></h1>
@@ -50,7 +51,7 @@
                 }
             } else {
                 let notLogged = document.getElementById("home") 
-                notLogged.style.display = "block"
+                notLogged.style.display = "grid"
             }
         </script>
     </body>
