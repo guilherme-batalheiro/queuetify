@@ -1,149 +1,20 @@
 body {
   background-color: black;
-  margin:0px;
-
 }
 
-
 #content {
-
-    height: 100vh;
-    width: 100vw;
-    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    background-color: #1c2541;
-    margin: 0;
+    text-align: center;
+    min-height: 50vh;
+    flex-shrink: 0;
 }
 
 #home {
-    display: grid;
-    grid-template-rows: repeat(100, 1fr);
-    grid-template-columns: repeat(100,1fr);
+    display:none;
     text-align: center;
-    height: 100vh;
-    width: 100vw;
-
 }
-@media only screen and (min-width: 900px) {
-#app_name {
-    text-align: left;
-    grid-row: 20/ span 20;
-    grid-column: 1 / 100;
-    font-size: calc(110px + 1.6vw);
-    color: #fb8f67;
-    height: 100%;
-    width: 100%;
-    margin: 10px;
-}
-#create_room_button {
-    grid-row: 41 / span 10;
-    grid-column: 2/ 39;
-    border: 0px;
-    background: none;
-    float: left;
-    font-size: calc(50px + 1vw);
-    font-weight: bold;
-    color: #e0e1dd;
-    cursor: pointer;
-    text-align: left;
-    transition-duration: 0.4s;
-
-    border-radius: 1vw;
-    height: 100%;
-    width: 100%;
-    margin: 10px;
-    
-}
-#create_room_button:hover{
-    background-color: #3a4b69;
-    font-size: 4.57vw;
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-    border-radius: 1vw;
-  }
-
-#join_room_button {
-    grid-row: 52 / span 10;
-    grid-column: 2/ 39;
-    border: 0px;
-    background: none;
-
-    float: left;
-    font-size: calc(50px + 1vw);
-    font-weight: bold;
-
-    color: #e0e1dd;
-    cursor: pointer;
-    text-align: left;
-    transition-duration: 0.4s;
-
-    border-radius: 1vw;
-    height: 100%;
-    width: 100%;
-    margin: 10px;
-}
-#join_room_button:hover{
-    background-color: #3a4b69;
-    font-size: 4.57vw;
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-    border-radius: 1vw;
-  }
-
-}
-@media only screen and (max-width: 900px) {
-    #app_name {
-        text-align: left;
-        grid-row: 3/ span 20;
-        grid-column: 1 / 100;
-        font-size: calc(110px + 1.6vw);
-        color: #fb8f67;
-        height: 100%;
-        width: 100%;
-        margin: 10px;
-    }
- 
-
-#create_room_button {
-    grid-row: 36 / span 10;
-    grid-column: 2/ 100;
-    border: 0px;
-    background: none;
-    float: left;
-    font-size: calc(50px + 1vw);
-    font-weight: bold;
-    color: #e0e1dd;
-    cursor: pointer;
-    text-align: left;
-    transition-duration: 0.4s;
-
-    border-radius: 1vw;
-    height: 100%;
-    width: 100%;
-    margin: 10px;
-    
-}
-
-#join_room_button {
-    grid-row: 52 / span 10;
-    grid-column: 2/ 100;
-    border: 0px;
-    background: none;
-
-    float: left;
-    font-size: calc(50px + 1vw);
-    font-weight: bold;
-
-    color: #e0e1dd;
-    cursor: pointer;
-    text-align: left;
-    transition-duration: 0.4s;
-
-    border-radius: 1vw;
-    height: 100%;
-    width: 100%;
-    margin: 10px;
-}
-
-} 
 
 #room {
     display: none;
