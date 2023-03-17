@@ -1,8 +1,9 @@
 const hostAddress = "127.0.0.1"
 const hostBackEndPort = "8080"
 const hostFrontEndPort = "8081"
+const clientId = ""
 
-const url = "http://accounts.spotify.com/authorize?response_type=code&client_id=f4a290e1e7a648458eb0cc169279c4ac&scope=user-read-email%20user-modify-playback-state%20user-read-playback-state%20user-read-currently-playing&redirect_uri=http%3A%2F%2F" + hostAddress + "%3A" + hostFrontEndPort + "%2Fapp.html"
+const url = "http://accounts.spotify.com/authorize?response_type=code&client_id=" + clientId + "&scope=user-read-email%20user-modify-playback-state%20user-read-playback-state%20user-read-currently-playing&redirect_uri=http%3A%2F%2F" + hostAddress + "%3A" + hostFrontEndPort + "%2Fapp.html"
 
 const urlSearchParams = new URLSearchParams(window.location.search)
 const params = Object.fromEntries(urlSearchParams.entries())
@@ -153,14 +154,14 @@ function updateSong(room_code, loop) {
 }
 
 function voteToSkipSong() {
-	if (progress_voting) {
-        return;
-    }
-
-    progress_voting = true;
-
 	console.log(localStorage.getItem("can_vote"))
     if(localStorage.getItem("can_vote") == "true") {
+	    if (progress_voting) {
+            return;
+        }
+
+        progress_voting = true;
+
         fetch('http://' + hostAddress + ':' + hostBackEndPort + '/vote_skip_song?room_code=' + localStorage.getItem("room_code"), {
             method: 'get',})
         .then(response => {
@@ -181,7 +182,11 @@ function voteToSkipSong() {
             alert("Vote failed!")
 			localStorage.setItem("can_vote", "true")
             console.log(error);
+        })
+        .finally(() => {
+            progress_voting = false;
         });
+
     } else {
 		alert("You already voted if a new song is playing refresh the page.")
 	}
