@@ -10,11 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
+	"net/url"
 )
 
 func add_music_to_queue_spotify(c *gin.Context) {
 	// add music to queue in spotify
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	room_code := c.Request.URL.Query().Get("room_code")
 	song_name := c.Request.URL.Query().Get("song_name")
 	song_name = strings.ReplaceAll(song_name, "%20", " ")
@@ -31,7 +31,6 @@ func add_music_to_queue_spotify(c *gin.Context) {
 
 func delete_user_room(c *gin.Context) {
 	// delete user room
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	user_id := c.Request.URL.Query().Get("user_id")
 
 	err := delete_user_room_db(user_id)
@@ -44,7 +43,6 @@ func delete_user_room(c *gin.Context) {
 
 func create_user_room(c *gin.Context) {
 	// create user room
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	user_id := c.Request.URL.Query().Get("user_id")
 
 	response, err := create_user_room_func(user_id)
@@ -59,7 +57,6 @@ func create_user_room(c *gin.Context) {
 
 func join_room(c *gin.Context) {
 	// join a room
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	room_code := c.Request.URL.Query().Get("room_code")
 
 	err := icrement_users_number_in_db(room_code)
@@ -73,7 +70,6 @@ func join_room(c *gin.Context) {
 
 func exit_room(c *gin.Context) {
 	// exit room
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	room_code := c.Request.URL.Query().Get("room_code")
 
 	err := decrement_users_number_in_db(room_code)
@@ -87,7 +83,6 @@ func exit_room(c *gin.Context) {
 
 func auth(c *gin.Context) {
 	// log in into the app with spotify
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	code := c.Request.URL.Query().Get("code")
 
 	response, err := auth_func(code)
@@ -102,7 +97,6 @@ func auth(c *gin.Context) {
 
 func current_song(c *gin.Context) {
 	// return current song playing
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	room_code := c.Request.URL.Query().Get("room_code")
 
 	response, err := current_song_func(room_code)
@@ -117,7 +111,6 @@ func current_song(c *gin.Context) {
 
 func vote_skip_song(c *gin.Context) {
 	// vote to skip song
-	c.Header("Access-Control-Allow-Origin", os.Getenv("CORS"))
 	room_code := c.Request.URL.Query().Get("room_code")
 
 	response, err := vote_skip_song_func(room_code)
@@ -128,6 +121,12 @@ func vote_skip_song(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, response)
+}
+
+func home(c *gin.Context) {
+	// return home page
+
+	c.HTML(http.StatusAccepted, "app.html", nil)
 }
 
 func checkAPI(c *gin.Context) {
@@ -145,6 +144,20 @@ func checkDB(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadGateway, "failed to pind data base")
 	}
 	c.IndentedJSON(http.StatusOK, "ok")
+}
+
+func login(c *gin.Context) {
+	baseURL := "http://accounts.spotify.com/authorize"
+
+	values := url.Values{}
+	values.Add("response_type", "code")
+	values.Add("client_id", os.Getenv("CLIENT_ID"))
+	values.Add("scope", "user-read-email user-modify-playback-state user-read-playback-state user-read-currently-playing")
+	values.Add("redirect_uri", "http://"+os.Getenv("ADDRESS")+"/")
+
+	url := baseURL + "?" + values.Encode()
+
+	c.Redirect(301, url)
 }
 
 func main() {
@@ -171,6 +184,10 @@ func main() {
 
 	// api endpoints
 	router := gin.Default()
+	router.LoadHTMLFiles("templates/app.html")
+
+	router.GET("/", home)
+	router.GET("/login", login)
 	router.GET("/auth", auth)
 	router.GET("/add_to_queue", add_music_to_queue_spotify)
 	router.POST("/join_room", join_room)

@@ -182,7 +182,7 @@ func request_tokens(code string) (map[string]interface{}, error) {
 	query := request.URL.Query()
 	query.Add("grant_type", "authorization_code")
 	query.Add("code", code)
-	query.Add("redirect_uri", os.Getenv("REDIRECT_URI"))
+	query.Add("redirect_uri", "http://"+os.Getenv("ADDRESS")+"/")
 	request.URL.RawQuery = query.Encode()
 
 	// add headers
