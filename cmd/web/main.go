@@ -19,6 +19,7 @@ type application struct {
 	errorLog       *log.Logger
 	infoLog        *log.Logger
 	users          *models.UserModel
+	rooms          *models.RoomModel
 	sessionManager *scs.SessionManager
 	CLIENT_ID      string
 	CLIENT_SECRET  string
@@ -63,6 +64,7 @@ func main() {
 		errorLog:       errorLog,
 		infoLog:        infoLog,
 		users:          &models.UserModel{DB: new(sync.Map)},
+		rooms:          &models.RoomModel{DB: new(sync.Map)},
 		sessionManager: sessionManager,
 		ADDRESS:        *addr,
 		CLIENT_ID:      *client_id,

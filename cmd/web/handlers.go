@@ -95,6 +95,7 @@ func (app *application) userSpotifyLoginCallback(w http.ResponseWriter, r *http.
 
 func (app *application) createRoom(w http.ResponseWriter, r *http.Request) {
 	var room_code string
+	var ok bool
 
 	spotify_id := app.sessionManager.GetString(r.Context(), "authenticatedUserID")
 
@@ -103,12 +104,14 @@ func (app *application) createRoom(w http.ResponseWriter, r *http.Request) {
 	if !has_room {
 		room_code = app.generateRoomCode()
 
-		ok := app.users.AddRoomCode(spotify_id, room_code)
+		ok = app.users.UpdateRoomCode(spotify_id, room_code)
 		if !ok {
 			app.errorLog.Println("Something went wrong in adding room code!")
 			app.clientError(w, http.StatusBadRequest)
 			return
 		}
+
+		app.rooms.Insert(room_code, spotify_id)
 	}
 
 	http.Redirect(w, r, "/room/"+room_code+"/", http.StatusPermanentRedirect)
@@ -117,8 +120,39 @@ func (app *application) createRoom(w http.ResponseWriter, r *http.Request) {
 func (app *application) room(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("id")
 
-     
+	room, found := app.rooms.Get(room_id)
+	if !found {
+		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+	}
 
+	files := []string{
+		"./ui/html/base.tmpl",
+		"./ui/html/pages/room.tmpl",
+	}
 
-	app.infoLog.Println(room_id)
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+    owner, found := app.users.Get(room.OwnerSpotifyId)
+    if !found {
+		app.errorLog.Println("Something went wrong is not supposed to have a room withouth owner")
+		app.clientError(w, http.StatusBadRequest)
+		return
+    }
+
+	data := struct {
+		RoomCode string
+		Owner    string
+	}{
+		RoomCode: room_id,
+		Owner:    owner.DisplayName,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
