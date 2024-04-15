@@ -4,6 +4,18 @@ function navigateToPage(url) {
     window.location.href = fullUrl;
 }
 
-document.getElementById("loginButton").addEventListener("click", function() {
-    navigateToPage('/userSpotifyLogin/');
-});
+let el = document.getElementById("loginButton") 
+if (el) {
+    el.addEventListener("click", function() {
+        navigateToPage('/userSpotifyLogin');
+    });
+}
+
+el = document.getElementById("createRoomButton") 
+if (el) {
+    el.addEventListener("click", function() {
+        navigateToPage('/room/createRoom');
+    });
+}
+
+

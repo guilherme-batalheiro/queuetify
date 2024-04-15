@@ -8,6 +8,12 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
 	if r.URL.Path != "/" {
 		app.notFound(w)
 		return
@@ -32,6 +38,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 }
 
@@ -53,6 +60,12 @@ func (app *application) userSpotifyLogin(w http.ResponseWriter, r *http.Request)
 }
 
 func (app *application) userSpotifyLoginCallback(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
 	queryParams := r.URL.Query()
 
 	code := queryParams.Get("code")
@@ -94,6 +107,12 @@ func (app *application) userSpotifyLoginCallback(w http.ResponseWriter, r *http.
 }
 
 func (app *application) createRoom(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
 	var room_code string
 	var ok bool
 
@@ -114,15 +133,22 @@ func (app *application) createRoom(w http.ResponseWriter, r *http.Request) {
 		app.rooms.Insert(room_code, spotify_id)
 	}
 
-	http.Redirect(w, r, "/room/"+room_code+"/", http.StatusPermanentRedirect)
+	http.Redirect(w, r, "/room/"+room_code, http.StatusPermanentRedirect)
 }
 
 func (app *application) room(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
 	room_id := r.PathValue("id")
 
 	room, found := app.rooms.Get(room_id)
 	if !found {
 		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+		return
 	}
 
 	files := []string{
@@ -136,23 +162,97 @@ func (app *application) room(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    owner, found := app.users.Get(room.OwnerSpotifyId)
-    if !found {
+	owner, found := app.users.Get(room.OwnerSpotifyId)
+	if !found {
 		app.errorLog.Println("Something went wrong is not supposed to have a room withouth owner")
 		app.clientError(w, http.StatusBadRequest)
 		return
-    }
+	}
+
+	spotify_id := app.sessionManager.GetString(r.Context(), "authenticatedUserID")
 
 	data := struct {
 		RoomCode string
 		Owner    string
+		IsOwner  bool
 	}{
 		RoomCode: room_id,
 		Owner:    owner.DisplayName,
+		IsOwner:  spotify_id == room.OwnerSpotifyId,
 	}
 
 	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
+	}
+}
+
+func (app *application) roomDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	room_id := r.PathValue("id")
+
+	room, found := app.rooms.Get(room_id)
+	if !found {
+		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+		return
+	}
+
+	owner, found := app.users.Get(room.OwnerSpotifyId)
+	if !found {
+		app.errorLog.Println("Something went wrong is not supposed to have a room withouth owner")
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	spotify_id := app.sessionManager.GetString(r.Context(), "authenticatedUserID")
+
+	// owner is deleting the room
+	if owner.SpotifyId == spotify_id {
+		app.rooms.Delete(room_id)
+        app.users.UpdateRoomCode(room.OwnerSpotifyId, "")
+	}
+
+	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+}
+
+func (app *application) roomAddToQueuePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	room_id := r.PathValue("id")
+
+	room, found := app.rooms.Get(room_id)
+	if !found {
+		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+		return
+	}
+
+	owner, found := app.users.Get(room.OwnerSpotifyId)
+	if !found {
+		app.errorLog.Println("Something went wrong is not supposed to have a room withouth owner")
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	song_query := r.PostForm.Get("song_query")
+
+	_, err = spotify.RequestAddMusicToQueue(owner.AccessToken, song_query)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
 	}
 }

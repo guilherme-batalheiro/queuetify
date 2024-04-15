@@ -19,7 +19,6 @@ func (m *RoomModel) Insert(roomCode string, ownerSpotifyId string) (bool, error)
 }
 
 func (m *RoomModel) Get(roomCode string) (Room, bool) {
-
 	room, ok := m.DB.Load(roomCode)
 
 	if !ok {
@@ -27,4 +26,8 @@ func (m *RoomModel) Get(roomCode string) (Room, bool) {
 	}
 
 	return *room.(*Room), ok
+}
+
+func (m *RoomModel) Delete(roomCode string) {
+	m.DB.Delete(roomCode)
 }
