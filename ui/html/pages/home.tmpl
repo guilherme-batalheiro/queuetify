@@ -1,0 +1,13 @@
+{{define "title"}} Home {{end}}
+
+{{define "main"}}
+    {{if .IsAuthenticated}}
+        <button type="button" id="createRoomButton">Create room</button>
+        <button type="button">Join room</button>
+    {{else}}
+        <button type="button" id="loginButton">Log in</button>
+        <button type="button">Join room</button>
+    {{end}}
+
+    <script src="/static/js/home.js"></script>
+{{end}}

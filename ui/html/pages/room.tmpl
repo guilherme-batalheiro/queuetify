@@ -1,0 +1,17 @@
+{{define "title"}} Room {{end}}
+
+{{ define "main" }}
+    <h1>Room Code: {{ .RoomCode }}</h1>
+    <h1>Owner: {{ .Owner }}</h1>
+    <div> 
+        <input type="text" id="musicInput" placeholder="Enter music...">
+        <button id="addSongToQueue">Add Music</button>
+    </div>
+
+    {{if .IsOwner}}
+        <button type="button" id="deleteRoomButton">Delete room</button>
+    {{else}}
+    {{end}}
+
+    <script src="/static/js/room.js"></script>
+{{ end }}
