@@ -1,15 +1,17 @@
 package models
 
-import "sync"
+import (
+	"sync"
+
+	"queuetify.gbatalheiro.pt/internal/spotify"
+)
 
 type User struct {
 	SpotifyId   string
 	DisplayName string
 	Email       string
 
-	AccessToken    string
-	AccessTokenExp float64
-	RefreshToken   string
+	Tokens spotify.Tokens
 
 	RoomCode string
 }
@@ -36,7 +38,7 @@ func (m *UserModel) Get(spotify_id string) (User, bool) {
 	return *user.(*User), ok
 }
 
-func (m *UserModel) UpdateTokens(spotify_id string, accessToken string, accessTokenExp float64, refreshToken string) bool {
+func (m *UserModel) UpdateTokens(spotify_id string, tokens spotify.Tokens) bool {
 
 	user, ok := m.DB.Load(spotify_id)
 
@@ -44,9 +46,7 @@ func (m *UserModel) UpdateTokens(spotify_id string, accessToken string, accessTo
 		return false
 	}
 
-	user.(*User).AccessToken = accessToken
-	user.(*User).AccessTokenExp = accessTokenExp
-	user.(*User).RefreshToken = refreshToken
+    user.(*User).Tokens = tokens
 
 	return true
 }

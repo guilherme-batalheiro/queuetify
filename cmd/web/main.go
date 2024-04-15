@@ -16,10 +16,11 @@ import (
 )
 
 type application struct {
-	errorLog       *log.Logger
-	infoLog        *log.Logger
-	users          *models.UserModel
-	rooms          *models.RoomModel
+	errorLog *log.Logger
+	infoLog  *log.Logger
+	users    *models.UserModel
+	rooms    *models.RoomModel
+
 	sessionManager *scs.SessionManager
 	CLIENT_ID      string
 	CLIENT_SECRET  string

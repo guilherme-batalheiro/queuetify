@@ -94,7 +94,7 @@ func (app *application) userSpotifyLoginCallback(w http.ResponseWriter, r *http.
 		app.users.Insert(spotifyUserInfo.Id, spotifyUserInfo.DisplayName, spotifyUserInfo.Email)
 	}
 
-	ok := app.users.UpdateTokens(spotifyUserInfo.Id, tokens.AccessToken, tokens.ExpiresIn, tokens.RefreshToken)
+	ok := app.users.UpdateTokens(spotifyUserInfo.Id, tokens)
 	if !ok {
 		app.errorLog.Println("Something went wrong in updating tokens!")
 		app.clientError(w, http.StatusBadRequest)
@@ -227,9 +227,9 @@ func (app *application) roomAddToQueuePost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	room_id := r.PathValue("id")
+	roomId := r.PathValue("id")
 
-	room, found := app.rooms.Get(room_id)
+	room, found := app.rooms.Get(roomId)
 	if !found {
 		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 		return
@@ -248,9 +248,15 @@ func (app *application) roomAddToQueuePost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	song_query := r.PostForm.Get("song_query")
+	songQuery := r.PostForm.Get("song_query")
 
-	_, err = spotify.RequestAddMusicToQueue(owner.AccessToken, song_query)
+    accessToken, err := owner.Tokens.GetAccessToken()
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	_, err = spotify.RequestAddMusicToQueue(accessToken, songQuery)
 	if err != nil {
 		app.errorLog.Println(err)
 		return
